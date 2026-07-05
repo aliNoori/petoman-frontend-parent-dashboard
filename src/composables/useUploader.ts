@@ -114,7 +114,6 @@ export function useUploader() {
         return finalizeRes.data.url
     }
 
-
     // 📌 آپلود فایل عمومی
     const uploadFile = async (input: File | string): Promise<string> => {
         let file: File
