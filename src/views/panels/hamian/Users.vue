@@ -191,7 +191,7 @@
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-br from-rose-400 to-rose-600 flex items-center justify-center">
 
-                  <img v-if="user.avatar"
+                  <img v-if="user?.avatar && user.avatar !== 'null' && user.avatar.trim() !== ''"
                       :src="user.avatar"
                       :alt="user.name?.charAt(0)"
                       class="w-10 h-10 rounded-full object-cover text-center content-center"
@@ -568,7 +568,7 @@ const userStore = useUserStore()
 const users = computed(() =>
     userStore.users.map(u => {
       // بررسی نقش‌ها
-      const rolesArray = Array.isArray(u.roles) ? u.roles : []
+      const rolesArray = Array.isArray(u.legacyRoles) ? u.legacyRoles : []
       let role = 'hamian_subscriber' // پیش‌فرض
 
       if (rolesArray.includes('supporter_admin')) {

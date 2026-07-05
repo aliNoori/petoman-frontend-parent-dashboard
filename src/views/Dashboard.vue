@@ -21,7 +21,7 @@
             <div class="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-lg">
               <div
                   class="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
-                <img v-if="user?.avatar"
+                <img v-if="user?.avatar && user.avatar !== 'null' && user.avatar.trim() !== ''"
                      :src="user?.avatar"
                      :alt="user.fullName?.charAt(0)"
                      class="w-8 h-8 rounded-full object-cover text-center content-center"

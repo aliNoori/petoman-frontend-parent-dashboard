@@ -14,7 +14,7 @@ export interface User {
     isActive: boolean
     email: string
     phoneNumber: string
-    roles:[]
+    legacyRoles:[]
     role: string
     location: string
     avatar?: string | File | null
@@ -28,7 +28,7 @@ export interface UserForm {
     isActive: boolean
     email: string
     phone: string
-    roles:[]
+    legacyRoles:[]
     avatar?: string | File | null
 }
 export interface Donation {
@@ -130,7 +130,7 @@ export const useUserStore = defineStore('userStore', () => {
                 isActive: newUser.isActive,
                 email: newUser.email,
                 phoneNumber: newUser.phoneNumber,
-                roles:newUser.roles,
+                roles:newUser.legacyRoles,
                 avatar: avatarUrl,
                 password:newUser.password
             }
@@ -153,13 +153,13 @@ export const useUserStore = defineStore('userStore', () => {
                 isActive: updatedData.isActive,
                 email: updatedData.email,
                 phoneNumber: updatedData.phoneNumber,
-                roles:updatedData.roles,
+                roles:updatedData.legacyRoles,
                 avatar: avatarUrl,
             }
             const { data } = await axios.patch(`/users/${id}`, payload)
             const index = users.value.findIndex(u => u.id === id)
             if (index !== -1) {
-                const rolesArray = Array.isArray(data.roles) ? data.roles : []
+                const rolesArray = Array.isArray(data.legacyRoles) ? data.legacyRoles : []
                 let role = 'user'
                 if (rolesArray.includes('admin')) role = 'admin'
                 else if (rolesArray.includes('user')) role = 'user'
@@ -261,7 +261,7 @@ export const useUserStore = defineStore('userStore', () => {
             isActive: form.isActive,
             email: form.email,
             phone: form.phone,
-            roles:form.roles,
+            legacyRoles:form.legacyRoles,
             avatar: form.avatar,
         }
     }

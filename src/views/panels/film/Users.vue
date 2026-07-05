@@ -96,7 +96,7 @@
               <div class="flex items-center gap-3">
                 <div
                     class="w-12 h-12 rounded-full bg-gradient-to-br from-rose-400 to-rose-600 flex items-center justify-center">
-                  <img v-if="user.avatar"
+                  <img v-if="user?.avatar && user.avatar !== 'null' && user.avatar.trim() !== ''"
                        :src="user.avatar"
                        :alt="user.name.charAt(0)"
                        class="w-12 h-12 rounded-full object-cover content-center align-center text-center"
@@ -107,7 +107,7 @@
             </td>
             <td class="px-6 py-4">
               <div v-if="user.role === 'film_admin'" class="text-sm">
-                <div class="font-mono text-purple-600">@{{ user.username }}</div>
+                <div v-if="user.username" class="font-mono text-purple-600">@{{ user.username }}</div>
                 <div class="text-gray-500 text-xs mt-0.5">{{ user.phone }}</div>
               </div>
               <div v-else class="text-sm text-gray-700">
@@ -306,7 +306,7 @@ const toast = useToast()
 const users = computed(() =>
     userStore.users.map(u => {
       // بررسی نقش‌ها
-      const rolesArray = Array.isArray(u.roles) ? u.roles : []
+      const rolesArray = Array.isArray(u.legacyRoles) ? u.legacyRoles : []
       let role = 'film_subscriber' // پیش‌فرض
 
       if (rolesArray.includes('film_admin')) {

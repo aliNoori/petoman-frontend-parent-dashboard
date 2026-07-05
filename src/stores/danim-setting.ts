@@ -343,6 +343,12 @@ export const useDanimSettingStore = defineStore('danimSettingStore', () => {
         try {
             const { data } = await axios.get('/danim-settings/page-sections')
 
+            if (!data || !data.pageSections || !Array.isArray(data.pageSections.items)) {
+                console.warn("No valid page sections data received. Response:", data);
+                pageSections.value = []; // مقدار پیش‌فرض خالی
+                return; // از ادامه کار خودداری کنید
+            }
+
             pageSections.value = data.pageSections.items.map((item: any) =>
                 normalizePageSection(item)
             )

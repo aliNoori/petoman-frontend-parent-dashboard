@@ -415,6 +415,7 @@ const showStatusDropdown = ref(false)
 
 const selectedCategory = ref()
 const categories = computed(() => categoryStore.categories)
+console.log('c',categories.value)
 const tagTypeStore = useTagTypeStore()
 const tagStore = useTagStore()
 const tags = computed(() => tagStore.tags)

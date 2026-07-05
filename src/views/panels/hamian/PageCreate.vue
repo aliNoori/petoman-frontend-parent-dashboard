@@ -241,10 +241,13 @@ const errors = ref({
 // Load page data if editing
 onMounted(async () => {
   const page = history.state.page
-  await pageStore.fetchPage(page)
-  if (pageStore.page) {
-    form.value = {...pageStore.page}
+  if(page){
+    await pageStore.fetchPage(page)
+    if (pageStore.page) {
+      form.value = {...pageStore.page}
+    }
   }
+
 })
 
 const loadPageData = async () => {

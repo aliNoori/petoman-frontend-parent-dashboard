@@ -184,6 +184,7 @@
                 >
                 <div class="relative">
                   <img
+                      v-if="user?.avatar && user.avatar !== 'null' && user.avatar.trim() !== ''"
                     :src="user.avatar"
                     :alt="user.name.charAt(0)"
                     class="w-12 h-12 rounded-full object-cover text-center content-center"
@@ -321,7 +322,7 @@
               >
               <div class="relative">
                 <img
-                  :src="user.avatar"
+                  :src="user?.avatar && user.avatar !== 'null' && user.avatar.trim() !== ''"
                   :alt="user.name"
                   class="w-12 h-12 rounded-full object-cover"
                 >
@@ -1044,7 +1045,7 @@ const users = computed(() =>
         avatar:u.avatar,
         email: u.email,
         phone: u.phoneNumber,
-        role:Array.isArray(u.roles) ? u.roles[0] : [],
+        role:Array.isArray(u.legacyRoles) ? u.legacyRoles[0] : [],
         isActive: u.isActive,
         status:u.isActive?'active':'inactive',
         createdAt: toJalaliDate(u.createdAt),

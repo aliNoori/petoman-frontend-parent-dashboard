@@ -194,7 +194,12 @@
               <div class="flex items-center gap-3">
                 <div
                     class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-sm font-bold">
-                  {{ supporter.initials }}
+                  <img v-if="supporter?.avatar && supporter.avatar !== 'null' && supporter.avatar.trim() !== ''"
+                       :src="supporter?.avatar"
+                       :alt="supporter?.name.charAt(0)"
+                       class="w-10 h-10 rounded-full object-cover"
+                  >
+                  <span v-else class="text-white text-sm font-medium">{{ supporter.name?.charAt(0) }}</span>
                 </div>
                 <div>
                   <div class="font-medium text-gray-900">{{ supporter.name }}</div>

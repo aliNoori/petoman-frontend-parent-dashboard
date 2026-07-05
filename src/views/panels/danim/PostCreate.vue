@@ -324,7 +324,7 @@
                 input-class="input-field cursor-pointer"
                 :editable="false"
                 locale="fa"
-                locale-config="{
+                :locale-config="{
                 fa: {
                   lang: {
                     label: 'شمسی',

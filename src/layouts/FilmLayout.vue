@@ -15,7 +15,7 @@
         <div class="flex items-center gap-2">
           <button @click="showProfileBottomSheet = true" class="flex items-center gap-2 p-1 hover:bg-gray-100 rounded-lg transition-colors">
             <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
-              <img v-if="user?.avatar"
+              <img v-if="user?.avatar && user.avatar !== 'null' && user.avatar.trim() !== ''"
                    :src="user?.avatar"
                    :alt="user?.fullName.charAt(0)"
                    class="w-8 h-8 rounded-full object-cover"
@@ -231,7 +231,7 @@
                   class="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
-                    <img v-if="user?.avatar"
+                    <img v-if="user?.avatar && user.avatar !== 'null' && user.avatar.trim() !== ''"
                          :src="user?.avatar"
                          :alt="user.fullName?.charAt(0)"
                          class="w-10 h-10 rounded-full text-center content-center object-cover"
@@ -249,7 +249,7 @@
                     <div class="px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-pink-50">
                       <div class="flex items-center gap-3">
                         <div class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
-                          <img v-if="user?.avatar"
+                          <img v-if="user?.avatar && user.avatar !== 'null' && user.avatar.trim() !== ''"
                                :src="user?.avatar"
                                :alt="user.fullName?.charAt(0)"
                                class="w-12 h-12 rounded-full object-cover text-center content-center"
@@ -322,7 +322,7 @@
           <div class="px-6 py-4 border-b border-gray-100">
             <div class="flex items-center gap-4">
               <div class="w-16 h-16 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
-                <img v-if="user?.avatar"
+                <img v-if="user?.avatar && user.avatar !== 'null' && user.avatar.trim() !== ''"
                      :src="user?.avatar"
                      :alt="user?.fullName.charAt(0)"
                      class="w-16 h-16 rounded-full object-cover"

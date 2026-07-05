@@ -18,7 +18,7 @@
                   class="flex items-center gap-2 p-1 hover:bg-gray-100 rounded-lg transition-colors">
             <div
                 class="w-8 h-8 rounded-full bg-gradient-to-br from-rose-400 to-rose-600 flex items-center justify-center">
-              <img v-if="user?.avatar"
+              <img v-if="user?.avatar && user.avatar !== 'null' && user.avatar.trim() !== ''"
                    :src="user?.avatar"
                    :alt="user?.fullName.charAt(0)"
                    class="w-8 h-8 rounded-full object-cover"
@@ -254,7 +254,7 @@
                 >
                   <div
                       class="w-10 h-10 rounded-full bg-gradient-to-br from-rose-400 to-rose-600 flex items-center justify-center">
-                    <img v-if="user?.avatar"
+                    <img v-if="user?.avatar && user.avatar !== 'null' && user.avatar.trim() !== ''"
                          :src="user?.avatar"
                          :alt="user.fullName?.charAt(0)"
                          class="w-10 h-10 rounded-full text-center content-center object-cover"
@@ -275,7 +275,7 @@
                       <div class="flex items-center gap-3">
                         <div
                             class="w-12 h-12 rounded-full bg-gradient-to-br from-rose-400 to-rose-600 flex items-center justify-center">
-                          <img v-if="user?.avatar"
+                          <img v-if="user?.avatar && user.avatar !== 'null' && user.avatar.trim() !== ''"
                                :src="user?.avatar"
                                :alt="user.fullName?.charAt(0)"
                                class="w-12 h-12 rounded-full object-cover text-center content-center"
@@ -355,7 +355,7 @@
             <div class="flex items-center gap-4">
               <div
                   class="w-16 h-16 rounded-full bg-gradient-to-br from-rose-400 to-rose-600 flex items-center justify-center">
-                <img v-if="user?.avatar"
+                <img v-if="user?.avatar && user.avatar !== 'null' && user.avatar.trim() !== ''"
                      :src="user?.avatar"
                      :alt="user?.fullName.charAt(0)"
                      class="w-16 h-16 rounded-full object-cover"

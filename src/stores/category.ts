@@ -38,6 +38,7 @@ export const useCategoryStore = defineStore('categoryStore', () => {
         try {
             const { data } = await axios.get('/categories', { params: filters })
             categories.value = data
+            console.log('ccc',categories.value)
             fetched.value = true
         } catch (error) {
             console.error('❌ خطا در دریافت دسته‌بندی‌ها:', error)

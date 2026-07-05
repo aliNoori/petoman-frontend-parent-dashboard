@@ -104,7 +104,7 @@
         <div class="relative h-24 bg-gradient-to-br from-blue-400 to-cyan-500">
           <div class="absolute -bottom-12 right-6">
             <div class="w-24 h-24 rounded-full border-4 border-white bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-              <img v-if="supporter.avatar"
+              <img v-if="supporter?.avatar && supporter.avatar !== 'null' && supporter.avatar.trim() !== ''"
                    :src="supporter.avatar"
                    :alt="supporter.name"
                    class="w-24 h-24 rounded-full object-cover"

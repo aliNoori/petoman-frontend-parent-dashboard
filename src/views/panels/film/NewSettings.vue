@@ -732,7 +732,7 @@
                 class="input-field"
                 maxlength="60"
             >
-            <p class="text-xs text-gray-500 mt-1">{{ settings.seo.metaTitle.length }}/60 کاراکتر</p>
+            <p class="text-xs text-gray-500 mt-1">{{ settings.seo.metaTitle?.length }}/60 کاراکتر</p>
           </div>
 
           <div>
@@ -744,7 +744,7 @@
                 class="input-field resize-none"
                 maxlength="160"
             ></textarea>
-            <p class="text-xs text-gray-500 mt-1">{{ settings.seo.metaDescription.length }}/160 کاراکتر</p>
+            <p class="text-xs text-gray-500 mt-1">{{ (settings.seo.metaDescription||'').length }}/160 کاراکتر</p>
           </div>
 
           <div>
@@ -1067,15 +1067,30 @@ const settings = ref({
 })
 
 const loadSettings = () => {
-    try {
-      settings.value = filmSettingStore.settings
-      if(settings.value.opengraph.image){
-        settings.value.opengraph.ojPreview=settings.value.opengraph.image
+  try {
+
+    if (filmSettingStore.settings) {
+
+      settings.value = {
+        ...settings.value, // داده‌های پیش‌فرض
+        ...filmSettingStore.settings,
+      };
+
+      // تنظیم پیش‌نمایش تصاویر
+      if (settings.value.opengraph?.image) {
+        settings.value.opengraph.ojPreview = settings.value.opengraph.image;
       }
-    } catch (e) {
-      console.error('Error loading settings:', e)
+      if (settings.value.general?.logoUrl) {
+        settings.value.general.logoPreview = settings.value.general.logoUrl;
+      }
+      if (settings.value.general?.faviconUrl) {
+        settings.value.general.faviconPreview = settings.value.general.faviconUrl;
+      }
     }
-}
+  } catch (e) {
+    console.error('Error loading settings:', e);
+  }
+};
 
 const addSlide = () => {
   settings.value.general.slides.push({
