@@ -38,7 +38,7 @@ const loadTinyMCE = () => {
     }
 
     const script = document.createElement('script')
-    script.src = '/tinymce/tinymce.min.js'
+    script.src = '/dashboard/tinymce/tinymce.min.js'
     script.onload = () => resolve()
     script.onerror = () => reject(new Error('❌ Failed to load TinyMCE'))
     document.head.appendChild(script)
