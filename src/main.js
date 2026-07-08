@@ -388,13 +388,23 @@ const routes = [
 ]
 
 const router = createRouter({
+  //history: createWebHistory('/dashboard/'),
   history: createWebHistory(),
   routes
 })
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
-  const userData = JSON.parse(localStorage.getItem('user') || '{}')
+  const rawUser = localStorage.getItem('user')
+
+  let userData = {}
+
+  try {
+    userData = rawUser ? JSON.parse(rawUser) : {}
+  } catch {
+    localStorage.removeItem('user')
+    userData = {}
+  }
   const userRoles = userData.roles || []
 
   // اگر احراز هویت لازم دارد و توکن نیست

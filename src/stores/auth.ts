@@ -38,7 +38,11 @@ export const useAuthStore = defineStore('authStore', () => {
             userStore.user = data?.user
 
             localStorage.setItem('token', accessToken)
-            localStorage.setItem('user', JSON.stringify(data?.user))
+            if (data?.user) {
+                localStorage.setItem('user', JSON.stringify(data.user))
+            } else {
+                localStorage.removeItem('user')
+            }
             // تنظیم هدر پیش‌فرض
             axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
 
