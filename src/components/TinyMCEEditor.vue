@@ -38,7 +38,7 @@ const loadTinyMCE = () => {
     }
 
     const script = document.createElement('script')
-    script.src = '/dashboard/tinymce/tinymce.min.js'
+    script.src = `${import.meta.env.BASE_URL}tinymce/tinymce.min.js`
     script.onload = () => resolve()
     script.onerror = () => reject(new Error('❌ Failed to load TinyMCE'))
     document.head.appendChild(script)
@@ -52,6 +52,8 @@ const initEditor = async () => {
 
     const config = {
       selector: `#${editorId.value}`,
+      base_url: `${import.meta.env.BASE_URL}tinymce`,
+      suffix: '.min',
       height: props.height,
       directionality: 'rtl',
       license_key: 'gpl',
@@ -111,7 +113,7 @@ const initEditor = async () => {
             const file = input.files[0]
             if (!file) return
             const url = await pageStore.uploadImage(file)
-            console.log('iiiiiiiiiii')
+
             callback(url, { alt: file.name })
           }
           input.click()
