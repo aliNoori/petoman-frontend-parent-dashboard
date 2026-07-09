@@ -69,7 +69,7 @@
       <div v-if="section.data.menuItems && section.data.menuItems.length > 0" class="space-y-2">
         <div v-for="(item, itemIndex) in section.data.menuItems" :key="itemIndex" class="flex items-center gap-2 p-3 border rounded-lg bg-white">
           <i class="ti ti-grip-vertical text-gray-400"></i>
-          <input v-model="item.label" type="text" class="input-field flex-1 text-sm" placeholder="عنوان">
+          <input v-model="item.label" type="text" class="input-field flex-2 text-sm" placeholder="عنوان">
           <input v-model="item.link" type="text" class="input-field w-32 text-sm" placeholder="/link">
           <button @click="removeMenuItem(itemIndex)" class="text-red-600 hover:text-red-700">
             <i class="ti ti-trash"></i>
