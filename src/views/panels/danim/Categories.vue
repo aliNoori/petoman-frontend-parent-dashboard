@@ -913,7 +913,7 @@ const saveCategory = async () => {
   if (showEditModal.value) {
     const updatedCategory = {
       ...categoryForm.value,
-      typeId: categoryForm.typeId?.trim(),
+      typeId: categoryForm.value.typeId?.trim(),
       isActive:categoryForm.value.status === 'active',
       contentType:'danim'
     }
@@ -938,7 +938,7 @@ const saveCategory = async () => {
     // Add new category
     const newCategory = {
       ...categoryForm.value,
-      typeId: categoryForm.typeId?.trim(),
+      typeId: categoryForm.value.typeId?.trim(),
       contentType:'danim'
     }
     await categoryStore.addCategoryWithImages({
@@ -1014,14 +1014,14 @@ const uploadCategoryCover = (event) => {
 
 // Watch for name changes to auto-generate slug
 watch(() => categoryForm.value.title, (newTitle) => {
-  if (!showEditModal.value && newTitle) {
+  /*if (!showEditModal.value && newTitle) {
     categoryForm.value.slug = newTitle
         .toLowerCase()
         .replace(/[^a-z0-9\u0600-\u06FF\s-]/g, '')
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-')
         .trim()
-  }
+  }*/
 })
 
 // Initialize data
