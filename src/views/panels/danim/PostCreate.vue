@@ -1089,8 +1089,8 @@ const saveNewCategory = async () => {
   }
 
   const newCat = {
-    typeId: newCategoryForm.typeId.trim(),
-    title: newCategoryForm.title.trim(),
+    typeId: newCategoryForm.typeId?.trim(),
+    title: newCategoryForm.title?.trim(),
     slug: newCategoryForm.slug || generateSlugFromText(newCategoryForm.title),
     parentId: newCategoryForm.parentId ?? null,
     description: newCategoryForm.description

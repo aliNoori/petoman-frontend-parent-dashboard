@@ -920,7 +920,7 @@ const saveCategory = async () => {
     // Add new category
     const newCategory = {
       ...categoryForm.value,
-      typeId: categoryForm.typeId.trim(),
+      typeId: categoryForm.typeId?.trim(),
       contentType:'danim'
     }
     await categoryStore.addCategoryWithImages({
