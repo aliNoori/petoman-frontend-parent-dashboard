@@ -905,11 +905,6 @@ const editCategory = (category) => {
 
 const saveCategory = async () => {
 
-  if (!categoryForm.value.typeId) {
-    alert('لطفاً صبر کنید تا نوع دسته‌بندی بارگذاری شود')
-    return
-  }
-
   if (showEditModal.value) {
     const updatedCategory = {
       ...categoryForm.value,
