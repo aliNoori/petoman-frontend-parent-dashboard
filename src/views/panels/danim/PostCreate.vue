@@ -768,7 +768,7 @@ const showAddCategoryModal = ref(false)
 const showParentDropdown = ref(false)
 
 const newCategoryForm = reactive({
-  typId: null,
+  typeId: null,
   title: '',
   slug: '',
   parentId: null,

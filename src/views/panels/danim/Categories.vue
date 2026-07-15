@@ -733,12 +733,23 @@ const categoryForm = ref({
   createdAt: '',
   image: null,
   cover: null,
-  parentId: null
+  parentId: null,
+  typeId:null
 })
 const categoryTypeStore = useCategoryTypeStore()
 const categoryStore = useCategoryStore()
+
+const getPostCount = (category) => {
+  if (Array.isArray(category.posts)) return category.posts.length
+  if (typeof category.postCount === 'number') return category.postCount
+  if (typeof category._count?.posts === 'number') return category._count.posts
+  return 0
+}
+
 const flattenCategories = (tree) => {
   const result = []
+
+  if (!Array.isArray(tree)) return result
 
   tree.forEach(c => {
     result.push({
@@ -748,7 +759,7 @@ const flattenCategories = (tree) => {
       description: c.description,
       isActive:c.isActive,
       status: c.isActive ? 'active' : 'inactive',
-      postCount: c.posts.length ?? 0,
+      postCount: getPostCount(c),
       createdAt: new Date(c.createdAt).toLocaleDateString('fa-IR'),
       image: c.logo || 'https://via.placeholder.com/400x300/10B981/ffffff?text=Category',
       cover: c.cover || 'https://via.placeholder.com/800x200/10B981/ffffff?text=Category+Cover',
@@ -766,9 +777,9 @@ const flattenCategories = (tree) => {
 const categories = computed(() => flattenCategories(categoryStore.categoryTree))
 
 // Computed properties
-const activeCategories = computed(() => {
-  return categories.value.filter(cat => cat.status === 'active').length
-})
+const activeCategories = computed(() =>
+    categories.value.filter(cat => cat.status === 'active').length
+)
 
 const totalPosts = computed(() => {
   // همه پست‌ها از همه دسته‌ها
@@ -851,7 +862,8 @@ const resetForm = () => {
     createdAt: '',
     image: null,
     cover: null,
-    parentId: null
+    parentId: null,
+    typeId: categoryTypeStore.selectedType?.id ?? null
   }
 }
 
@@ -892,6 +904,12 @@ const editCategory = (category) => {
 }
 
 const saveCategory = async () => {
+
+  if (!categoryForm.value.typeId) {
+    alert('لطفاً صبر کنید تا نوع دسته‌بندی بارگذاری شود')
+    return
+  }
+
   if (showEditModal.value) {
     const updatedCategory = {
       ...categoryForm.value,
@@ -995,12 +1013,13 @@ const uploadCategoryCover = (event) => {
 };
 
 // Watch for name changes to auto-generate slug
-watch(() => categoryForm.value.name, (newName) => {
-  if (!showEditModal.value && newName) {
-    categoryForm.value.slug = newName
+watch(() => categoryForm.value.title, (newTitle) => {
+  if (!showEditModal.value && newTitle) {
+    categoryForm.value.slug = newTitle
         .toLowerCase()
-        .replace(/[^a-z0-9\u0600-\u06FF\s]/g, '')
+        .replace(/[^a-z0-9\u0600-\u06FF\s-]/g, '')
         .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
         .trim()
   }
 })
@@ -1013,7 +1032,7 @@ watch(
     () => categoryTypeStore.selectedType,
     async (type) => {
       if (type?.id) {
-        categoryForm.typeId = type.id
+        categoryForm.value.typeId = type.id
         await categoryStore.fetchCategoryTree( type.id,'danim')
       }
     },
