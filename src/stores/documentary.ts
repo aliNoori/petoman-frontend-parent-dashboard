@@ -272,6 +272,7 @@ export const useDocumentaryStore = defineStore('documentaryStore', () => {
         return new Blob([u8arr], {type: mime})
     }
 
+
     return {
         documentaries,
         documentary,
