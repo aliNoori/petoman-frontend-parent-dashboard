@@ -1,7 +1,8 @@
-import { defineStore } from 'pinia'
-import { ref, inject } from 'vue'
-import type { AxiosInstance } from 'axios'
-import { axiosKey } from '../plugins/axiosPlugins'
+import {defineStore} from 'pinia'
+import {ref, inject} from 'vue'
+import type {AxiosInstance} from 'axios'
+import {axiosKey} from '../plugins/axiosPlugins'
+import {useUploader} from "../composables/useUploader";
 
 // -------------------------
 // 🎬 Documentary Entity
@@ -32,7 +33,7 @@ export interface CreateDocumentaryDto {
     title: string
     description?: string
     category: string
-    categoryId:string
+    categoryId: string
     duration?: string
     publishDate?: string
     status?: 'draft' | 'published'
@@ -55,7 +56,8 @@ export const useDocumentaryStore = defineStore('documentaryStore', () => {
     const documentaries = ref<Documentary[]>([])
     const documentary = ref<Documentary | null>(null)
     const loading = ref(false)
-
+    const uploadProgress = ref<number>(0)
+    const uploader = useUploader()
     const axios = inject<AxiosInstance>(axiosKey)
     if (!axios) throw new Error('Axios instance not injected')
 
@@ -64,12 +66,12 @@ export const useDocumentaryStore = defineStore('documentaryStore', () => {
     // -------------------------
     const fetchDocumentaries = async () => {
         try {
-            const { data } = await axios.get('/v1/documentaries')
+            const {data} = await axios.get('/v1/documentaries')
 
             documentaries.value = data.map((doc: any) => ({
                 ...doc,
                 videoUrl: doc.videoUrl || '',
-                videoFile: doc.videoFile||'',
+                videoFile: doc.videoFile || '',
                 thumbnailUrl: doc.thumbnailPreview || '',
                 tags: Array.isArray(doc.tags) ? doc.tags : JSON.parse(doc.tags || '[]')
             }))
@@ -89,45 +91,44 @@ export const useDocumentaryStore = defineStore('documentaryStore', () => {
     const addDocumentary = async (form: CreateDocumentaryDto) => {
         try {
             loading.value = true
+            uploadProgress.value = 0  // 👈 پیشرفت آپلود
 
-            const formData = new FormData()
-
-            // 🧩 فیلدهای ساده
-            formData.append('categoryId', form.categoryId)
-            formData.append('title', form.title)
-            formData.append('description', form.description || '')
-            //formData.append('category', form.category)
-            formData.append('duration', form.duration || '')
-            formData.append('publishDate', form.publishDate || '')
-            formData.append('status', form.status || 'draft')
-            formData.append('seoTitle', form.seoTitle || '')
-            formData.append('seoDescription', form.seoDescription || '')
-            formData.append('seoKeywords', form.seoKeywords || '')
-            formData.append('slug', form.slug || '')
-
-            // 🏷️ تگ‌ها
-            if (form.tags && form.tags.length > 0) {
-                form.tags.forEach(tag => formData.append('tags[]', tag));
-            }
-
-
-            // 🎞️ ویدیو
-            if (form.videoUploadMethod === 'file' && form.videoFile) {
-                formData.append('videoFile', form.videoFile)
-                formData.append('videoUrl', '')
-            } else if (form.videoUploadMethod === 'url' && form.videoUrl) {
-                formData.append('videoUrl', form.videoUrl)
-                formData.append('videoFile','')
-            }
-
-            // 🖼️ Thumbnail (اختیاری)
+            // 🖼️ آپلود تصویر بندانگشتی (اگر base64 هست)
+            let thumbnailUrl: string | undefined
             if (form.thumbnailPreview) {
-                // Base64 را به Blob تبدیل می‌کنیم
-                const blob = base64ToBlob(form.thumbnailPreview)
-                formData.append('thumbnailPreview', blob, 'thumbnail.png')
+                thumbnailUrl = await uploader.uploadImage(form.thumbnailPreview)
             }
 
-            const { data } = await axios.post('/v1/documentaries', formData)
+            // 🎞️ آپلود ویدیو با uploader
+            let videoUrl = form.videoUrl  // پیش‌فرض: لینک واردشده توسط کاربر
+            if (form.videoUploadMethod === 'file' && form.videoFile) {
+                videoUrl = await uploader.uploadChunkedVideo(
+                    form.videoFile,
+                    (percent: number) => {
+                        uploadProgress.value = percent
+                    }
+                )
+            }
+
+            // 🧹 حذف فیلدهای موقتی قبل از ارسال
+            const {
+                videoFile: _vf,
+                videoUploadMethod: _vum,
+                thumbnailPreview: _tp,
+                category: _cat,
+                ...cleanForm
+            } = form
+
+            // 📦 ساخت Payload نهایی (JSON)
+            const payload = {
+                ...cleanForm,
+                tags: form.tags || [],
+                videoUrl,
+                categoryId: form.categoryId,
+                thumbnailPreview: thumbnailUrl,
+            }
+
+            const {data} = await axios.post('/v1/documentaries', payload)
             documentaries.value.unshift(data)
             console.log('✅ مستند جدید ثبت شد')
             return data
@@ -136,6 +137,7 @@ export const useDocumentaryStore = defineStore('documentaryStore', () => {
             throw err
         } finally {
             loading.value = false
+            uploadProgress.value = 0
         }
     }
 
@@ -143,62 +145,105 @@ export const useDocumentaryStore = defineStore('documentaryStore', () => {
     // -------------------------
 // ✏️ Update Documentary
 // -------------------------
-    const updateDocumentary = async (id: string, form: CreateDocumentaryDto) => {
+    const updateDocumentary = async (
+        id: string,
+        form: CreateDocumentaryDto
+    ) => {
         try {
             loading.value = true
-
-            const formData = new FormData()
-
-            // 🧩 فیلدهای ساده
-            formData.append('categoryId', form.categoryId)
-            formData.append('title', form.title)
-            formData.append('description', form.description || '')
-            formData.append('duration', form.duration || '')
-            formData.append('publishDate', form.publishDate || '')
-            formData.append('status', form.status || 'draft')
-            formData.append('seoTitle', form.seoTitle || '')
-            formData.append('seoDescription', form.seoDescription || '')
-            formData.append('seoKeywords', form.seoKeywords || '')
-            formData.append('slug', form.slug || '')
-
-            // 🏷️ تگ‌ها
-            if (form.tags && form.tags.length > 0) {
-                form.tags.forEach(tag => formData.append('tags[]', tag));
-            }
+            uploadProgress.value = 0
 
             // 🎞️ ویدیو
-            if (form.videoUploadMethod === 'file' && form.videoFile instanceof File) {
-                formData.append('videoFile', form.videoFile)
-            } else if (form.videoUploadMethod === 'url' && form.videoUrl) {
-                formData.append('videoUrl', form.videoUrl)
+            let videoUrl = form.videoUrl
+
+            if (
+                form.videoUploadMethod === 'file' &&
+                form.videoFile
+            ) {
+                videoUrl = await uploader.uploadChunkedVideo(
+                    form.videoFile,
+                    (percent: number) => {
+                        uploadProgress.value = percent
+                    }
+                )
             }
 
-            if (form.thumbnailPreview) {
-                // اگر Base64 است، به Blob تبدیل می‌کنیم
-                if (form.thumbnailPreview.startsWith('data:image')) {
-                    const blob = base64ToBlob(form.thumbnailPreview)
-                    formData.append('thumbnailPreview', blob, 'thumbnail.png')
+            // 🖼️ تصویر بندانگشتی
+            let thumbnailPreview = form.thumbnailPreview
+
+            if (
+                form.thumbnailPreview &&
+                form.thumbnailPreview.startsWith('data:image')
+            ) {
+                thumbnailPreview = await uploader.uploadImage(
+                    form.thumbnailPreview
+                )
+            }
+
+            // 🧹 حذف فیلدهای موقتی قبل از ارسال
+            const {
+                videoFile: _vf,
+                videoUploadMethod: _vum,
+                thumbnailPreview: _tp,
+                category:_cat,
+                ...cleanForm
+            } = form
+
+            // 📦 Payload نهایی JSON
+            const payload = {
+                ...cleanForm,
+
+                tags: form.tags || [],
+                categoryId:form.categoryId,
+                videoUrl,
+                thumbnailPreview,
+            }
+
+            const {data} = await axios.patch(
+                `/v1/documentaries/${id}`,
+                payload
+            )
+
+            const index =
+                documentaries.value.findIndex(
+                    documentary =>
+                        documentary.id === id
+                )
+
+            if (index !== -1) {
+                documentaries.value[index] = {
+                    ...documentaries.value[index],
+                    ...data
                 }
             }
 
-            const { data } = await axios.patch(`/v1/documentaries/${id}?_method=PUT`, formData)
-
-            const index = documentaries.value.findIndex(d => d.id === id)
-            if (index !== -1) {
-                documentaries.value[index] = { ...documentaries.value[index], ...data }
+            if (
+                documentary.value &&
+                documentary.value.id === id
+            ) {
+                documentary.value = {
+                    ...documentary.value,
+                    ...data
+                }
             }
-            if (documentary.value && documentary.value.id === id) {
-                documentary.value = { ...documentary.value, ...data }
-            }
 
-            console.log('✅ مستند با موفقیت به‌روزرسانی شد')
+            console.log(
+                '✅ مستند با موفقیت به‌روزرسانی شد'
+            )
+
             return data
         } catch (err) {
-            console.error('❌ خطا در بروزرسانی مستند:', err)
+            console.error(
+                '❌ خطا در بروزرسانی مستند:',
+                err
+            )
+
             throw err
         } finally {
             loading.value = false
+            uploadProgress.value = 0
         }
+
     }
 
 
@@ -224,12 +269,13 @@ export const useDocumentaryStore = defineStore('documentaryStore', () => {
         let n = bstr.length
         const u8arr = new Uint8Array(n)
         while (n--) u8arr[n] = bstr.charCodeAt(n)
-        return new Blob([u8arr], { type: mime })
+        return new Blob([u8arr], {type: mime})
     }
 
     return {
         documentaries,
         documentary,
+        uploadProgress,
         loading,
         fetchDocumentaries,
         selectDocumentary,

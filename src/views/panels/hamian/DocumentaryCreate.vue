@@ -209,11 +209,16 @@
                     انتخاب فایل ویدیو
                   </button>
                   <p class="text-xs text-gray-500 mt-2">فرمت‌های مجاز: MP4, WebM, MOV (حداکثر 500MB)</p>
+
                 </div>
               </div>
             </div>
-          </div>
 
+          </div>
+          <div v-if="documentaryStore.uploadProgress > 0">
+            <progress class="w-full" :value="documentaryStore.uploadProgress" max="100"></progress>
+            {{ documentaryStore.uploadProgress }}%
+          </div>
           <!-- Duration -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -458,11 +463,13 @@ const handleVideoUpload = (event) => {
       return
     }
     form.value.videoFile = file
+    form.value.videoUrl = URL.createObjectURL(file)
   }
 }
 
 const removeVideoFile = () => {
   form.value.videoFile = null
+  form.value.videoUrl=null
   if (videoInput.value) {
     videoInput.value.value = ''
   }
