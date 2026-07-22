@@ -340,8 +340,8 @@
         </div>
         </template>
 
-        <!-- Countdown Timer Settings - Only for Financial -->
-        <div v-if="form.type === 'financial'" class="md:col-span-2">
+        <!-- Countdown Timer Settings (برای هر دو نوع قرار) -->
+        <div class="md:col-span-2">
           <div class="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-4">
             <div class="flex items-center justify-between mb-4">
               <div class="flex items-center gap-2">
@@ -452,21 +452,20 @@
           </div>
         </div>
 
-        <!-- Status -->
+        <!-- Capacity (ظرفیت قرار) -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">
-            وضعیت <span class="text-red-500">*</span>
+            ظرفیت قرار (نفر)
           </label>
-          <select
-            v-model="form.status"
-            required
-            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          <input
+            v-model.number="form.capacity"
+            type="number"
+            min="0"
+            step="1"
+            placeholder="مثال: 50"
+            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent"
           >
-            <option value="active">در حال اجرا</option>
-            <option value="pending">در انتظار</option>
-            <option value="completed">تکمیل شده</option>
-            <option value="cancelled">لغو شده</option>
-          </select>
+          <p class="text-xs text-gray-500 mt-1">حداکثر تعداد شرکت‌کنندگان / حامیان این قرار</p>
         </div>
 
         <!-- Show on Homepage -->
@@ -562,7 +561,7 @@ const form = ref({
   endDate: '',
   endTime: '18:00',
   duration: '',
-  status: 'active',
+  capacity: '',  // ظرفیت قرار (نفر)
   category: '',
   image: null,
   showTimer: false,
@@ -581,6 +580,13 @@ function jalaliToDate(jalaliString) {
   const g = jalaali.toGregorian(jy, jm, jd);
 
   return new Date(g.gy, g.gm - 1, g.gd);
+}
+
+// تاریخ امروز را به‌صورت شمسی (YYYY/MM/DD) برمی‌گرداند
+function jalaaliJsToday() {
+  const now = new Date()
+  const j = jalaali.toJalaali(now.getFullYear(), now.getMonth() + 1, now.getDate())
+  return `${j.jy}/${j.jm}/${j.jd}`
 }
 
 const progressPreview = computed(() => {
@@ -686,15 +692,30 @@ const calculatedDuration = computed(() => {
 })
 
 // Timer preview (showing remaining time)
+// برای قرار مالی: endDate ؛ برای قرار دورهمی: eventDate (تا شروع)
 const timerPreview = computed(() => {
-  if (!form.value.endDate || !form.value.showTimer) return null
+  if (!form.value.showTimer) return null
 
-  const totalMinutes = minutesBetweenDates(
-    form.value.startDate || '1403/08/01',
-    form.value.startTime || '00:00',
-    form.value.endDate,
-    form.value.endTime || '23:59'
-  )
+  let totalMinutes = 0
+  if (form.value.type === 'financial') {
+    if (!form.value.endDate) return null
+    totalMinutes = minutesBetweenDates(
+      form.value.startDate || '1403/08/01',
+      form.value.startTime || '00:00',
+      form.value.endDate,
+      form.value.endTime || '23:59'
+    )
+  } else {
+    // volunteer: شمارش معکوس تا تاریخ برگزاری
+    if (!form.value.eventDate) return null
+    // تقریب ساده: از امروز تا eventDate
+    totalMinutes = minutesBetweenDates(
+      jalaaliJsToday(),
+      '00:00',
+      form.value.eventDate,
+      form.value.eventTime || '00:00'
+    )
+  }
 
   if (totalMinutes <= 0) return null
 

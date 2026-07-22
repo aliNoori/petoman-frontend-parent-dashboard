@@ -16,6 +16,7 @@ export interface KindnessMeeting {
     location?: string
     eventDate?: string
     eventTime?: string
+    capacity?: number
     manager: string
     startDate: string
     startTime: string
@@ -133,7 +134,10 @@ export const useKindnessMeetingStore = defineStore('kindnessMeetingStore', () =>
         loading.value = true
         try {
             const { data } = await axios.get(`/v1/kindness-meetings/${id}`)
-            kindnessMeeting.value = data.map((item:any) => ({
+            // توجه: این endpoint یک «آبجکت تکی» برمی‌گرداند، نه آرایه.
+            // قبلاً به اشتباه data.map زده می‌شد که کرش می‌کرد.
+            const item = data
+            kindnessMeeting.value = {
                 ...item,
                 _createdAtRaw: item.createdAt,
                 startDate: item.startDate ? toJalaliDate(item.startDate): null,
@@ -141,7 +145,7 @@ export const useKindnessMeetingStore = defineStore('kindnessMeetingStore', () =>
                 eventDate: item.eventDate ? toJalaliDate(item.eventDate): null,
                 createdAt: toJalaliDate(item.createdAt),
                 updatedAt: toJalaliDate(item.updatedAt)
-            }))
+            }
         } catch (error) {
             console.error('❌ خطا در دریافت قرار مهربانی:', error)
         } finally {
@@ -153,7 +157,8 @@ export const useKindnessMeetingStore = defineStore('kindnessMeetingStore', () =>
         loading.value = true
         try {
             const { data } = await axios.post('/v1/kindness-meetings', payload)
-            kindnessMeetings.value.unshift(data.data)
+            // کنترلر مستقیماً entity برمی‌گرداند (نه داخل data.data)
+            kindnessMeetings.value.unshift(data)
         } catch (error) {
             console.error('❌ خطا در ثبت قرار مهربانی:', error)
         } finally {
